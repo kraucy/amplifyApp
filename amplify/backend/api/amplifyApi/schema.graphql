@@ -1,0 +1,21 @@
+schema {
+    query: Query
+}
+
+type Query {
+    getItems: [Item]
+}
+
+type Item @model {
+  id: ID!
+  value: String!
+}
+
+type Mutation {
+    addItem(id: ID!, value: String): Item
+}
+
+enum ItemStatus {
+    done
+    pending
+}
