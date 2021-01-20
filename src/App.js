@@ -7,7 +7,7 @@ import awsconfig from './aws-exports';
 
 import './App.css';
 
-// Amplify.configure(awsconfig);
+Amplify.configure(awsconfig);
 
 function App() {
   const [one, setInputOne] = useState(0);
@@ -27,6 +27,13 @@ function App() {
     console.log(sum);
     // send sum to store to update
   };
+
+  //   useEffect(() => {
+  // 	  effect;
+  // 	  return () => {
+  // 		  cleanup;
+  // 	  };
+  //   }, [input]);
 
   return (
     <div className="App">
