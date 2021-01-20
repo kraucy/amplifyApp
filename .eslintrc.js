@@ -1,25 +1,25 @@
 module.exports = {
-	env: {
+  env: {
 	  browser: true,
 	  es2021: true,
 	  node: true,
-	},
-	extends: [
+  },
+  extends: [
 	  'plugin:react/recommended',
 	  'airbnb',
-	],
-	parserOptions: {
+  ],
+  parserOptions: {
 	  ecmaFeatures: {
-		jsx: true,
+      jsx: true,
 	  },
 	  ecmaVersion: 12,
 	  sourceType: 'module',
-	},
-	plugins: [
+  },
+  plugins: [
 	  'react',
-	],
-	rules: {
+  ],
+  rules: {
 	  'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }],
-	},
-  };
-  
+	  'no-mixed-spaces-and-tabs': ['error', 'smart-tabs'],
+  },
+};

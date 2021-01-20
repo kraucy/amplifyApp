@@ -1,81 +1,109 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Amplify, { API, graphqlOperation } from 'aws-amplify';
 import {
-  Button, Card, CardContent, TextField, Typography,
+  Button, TextField,
 } from '@material-ui/core';
-import awsconfig from './aws-exports';
+import { withAuthenticator } from '@aws-amplify/ui-react';
+import awsExports from './aws-exports';
+import { createItem } from './graphql/mutations';
+import { listItems } from './graphql/queries';
 
 import './App.css';
 
-Amplify.configure(awsconfig);
+Amplify.configure(awsExports);
 
-function App() {
-  const [one, setInputOne] = useState(0);
-  const [two, setInputTwo] = useState(0);
-  const [sum, setSum] = useState(0);
+const initialState = { id: '', value: '' };
 
-  const updateOne = (event) => {
-    setInputOne(event.target.value);
-  };
+const App = () => {
+  const [formState, setFormState] = useState(initialState);
+  const [items, setItems] = useState([]);
 
-  const updateTwo = (event) => {
-    setInputTwo(event.target.value);
-  };
+  async function fetchItems() {
+    try {
+      const itemData = await API.graphql(graphqlOperation(listItems));
+      const { itemList } = itemData.data.data.listItems;
+      setItems(itemList);
+      console.log(itemList);
+    } catch (error) {
+      console.log('error fetching items', error);
+    }
+  }
 
-  const updateSum = () => {
-    setSum(one + two);
-    console.log(sum);
-    // send sum to store to update
-  };
+  async function addItem() {
+    try {
+    //   if (!formState.value) {
+      const item = { ...formState };
+      setItems([...items, item]);
+      setFormState(initialState);
+      console.log(item);
+      await API.graphql(graphqlOperation(createItem, { input: item }));
+    //   }
+    } catch (error) {
+      console.log('error creating item', error);
+    }
+  }
 
-  //   useEffect(() => {
-  // 	  effect;
-  // 	  return () => {
-  // 		  cleanup;
-  // 	  };
-  //   }, [input]);
+  function setInput(key, value) {
+    setFormState({ ...formState, [key]: value });
+  }
+
+  useEffect(() => {
+    fetchItems();
+  }, []);
 
   return (
     <div className="App">
       <header className="App-header">
-        <Card>
+        {/* <Card>
           <CardContent>
-            <Typography>
-              The sum is
-              {' '}
-              {sum}
-              .
-            </Typography>
+            <Typography> */}
+        <p>
+
+          {/* The sum is
+          {' '}
+          {items.map((item) => )} */}
+          .
+
+        </p>
+        {/* </Typography>
+
           </CardContent>
-        </Card>
+        </Card> */}
         <form noValidate autoComplete="off">
           <TextField
             error
             id="input-one"
             label="Input One"
-            onChange={updateOne}
+            onChange={(event) => setInput('id', event.target.value)}
             required
-            value={one}
+            value={formState.id}
           />
           <TextField
             error
             id="input-two"
             label="Input Two"
-            onChange={updateTwo}
+            onChange={(event) => setInput('value', event.target.value)}
             required
-            value={two}
+            value={formState.value}
           />
         </form>
         <Button
-          onClick={updateSum}
+          onClick={addItem}
           type="submit"
           variant="outlined"
         >
-          Get Sum
+          Add Item
         </Button>
+        {/* <Button
+          onClick={getSum}
+          type="submit"
+          variant="outlined"
+        >
+          Add Item
+        </Button> */}
       </header>
     </div>
   );
-}
+};
 
-export default App;
+export default withAuthenticator(App);
