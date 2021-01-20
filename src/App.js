@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import Amplify, { API, graphqlOperation } from 'aws-amplify';
 import {
-  Button, TextField,
+  Button, Card, CardContent, TextField, Typography,
 } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 import { withAuthenticator } from '@aws-amplify/ui-react';
-import awsExports from './aws-exports';
+import awsExports from './aws-config';
 import { createItem } from './graphql/mutations';
 import { listItems } from './graphql/queries';
 
@@ -14,7 +15,21 @@ Amplify.configure(awsExports);
 
 const initialState = { id: '', value: '' };
 
+const useStyles = makeStyles((theme) => ({
+  root: {
+    display: 'flex',
+    flexDirection: 'column',
+    flexWrap: 'wrap',
+    '& > *': {
+      margin: theme.spacing(1),
+      width: theme.spacing(16),
+      height: theme.spacing(16),
+    },
+  },
+}));
+
 const App = () => {
+  const classes = useStyles();
   const [formState, setFormState] = useState(initialState);
   const [items, setItems] = useState([]);
 
@@ -31,13 +46,10 @@ const App = () => {
 
   async function addItem() {
     try {
-    //   if (!formState.value) {
       const item = { ...formState };
       setItems([...items, item]);
       setFormState(initialState);
-      console.log(item);
       await API.graphql(graphqlOperation(createItem, { input: item }));
-    //   }
     } catch (error) {
       console.log('error creating item', error);
     }
@@ -47,46 +59,55 @@ const App = () => {
     setFormState({ ...formState, [key]: value });
   }
 
+  const mapItems = () => (
+    items.map((item) => (
+      <p key={item.id}>
+        {item.value}
+      </p>
+    ))
+  );
+
   useEffect(() => {
     fetchItems();
   }, []);
 
   return (
     <div className="App">
-      <header className="App-header">
-        {/* <Card>
-          <CardContent>
-            <Typography> */}
-        <p>
-
-          {/* The sum is
-          {' '}
-          {items.map((item) => )} */}
-          .
-
-        </p>
-        {/* </Typography>
-
-          </CardContent>
-        </Card> */}
-        <form noValidate autoComplete="off">
-          <TextField
-            error
-            id="input-one"
-            label="Input One"
-            onChange={(event) => setInput('id', event.target.value)}
-            required
-            value={formState.id}
-          />
-          <TextField
-            error
-            id="input-two"
-            label="Input Two"
-            onChange={(event) => setInput('value', event.target.value)}
-            required
-            value={formState.value}
-          />
-        </form>
+      <div className="App-header">
+        <div className={classes.root}>
+          <Card>
+            <CardContent>
+              <Typography>
+                {items.length ? mapItems : 'No items in list yet'}
+              </Typography>
+            </CardContent>
+          </Card>
+          <form noValidate autoComplete="off">
+            <TextField
+              error
+              id="input-one"
+              label="Input One"
+              onChange={(event) => setInput('id', event.target.value)}
+              required
+              value={formState.id}
+            />
+            <TextField
+              error
+              id="input-two"
+              label="Input Two"
+              onChange={(event) => setInput('value', event.target.value)}
+              required
+              value={formState.value}
+            />
+          </form>
+          {/* <Button
+          onClick={getSum}
+          type="submit"
+          variant="outlined"
+        >
+          Add Item
+        </Button> */}
+        </div>
         <Button
           onClick={addItem}
           type="submit"
@@ -99,9 +120,9 @@ const App = () => {
           type="submit"
           variant="outlined"
         >
-          Add Item
+          Get Sum
         </Button> */}
-      </header>
+      </div>
     </div>
   );
 };
